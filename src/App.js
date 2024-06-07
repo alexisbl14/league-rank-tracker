@@ -1,5 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
+import axios from 'axios';
 import SummonerCard from './components/summonerCard';
 import {useState, useEffect} from "react"
 
@@ -37,11 +38,23 @@ const summoners = [
 
 
 function App() {
-  const [summonersPUUID, setSummonersPUUID] = useState("")
+  const [summonersPUUID, setSummonersPUUID] = useState("old")
 
+  function getPlayerInfo(summoner) {
+    console.log("sending request to Riot API")
+    axios.get("http://localhost:4000/summonerRank", { params: {player: summoner}})
+      .then((response) => {
+        setSummonersPUUID(response.data);
+        return response.data
+      }).catch((err) => console.log(err))
+  }
+
+  getPlayerInfo(summoners[0])
+  getPlayerInfo(summoners[1])
+  getPlayerInfo(summoners[2])
   return (
     <div className="App">
-      <h1>Race to Next Rank</h1>
+      <h1>{summonersPUUID}</h1>
       <div className="leaderboard">
         {summoners.map((summoner, index) => {
           return <SummonerCard summoner={summoner.gameName} index={index}></SummonerCard>})}
@@ -50,7 +63,7 @@ function App() {
       <div className="tableBox">
         <table>
           <thead>
-            <tr><th>Summoner</th> <th>Peak Rank</th></tr>
+            <tr><th>Summoner</th><th>Peak Rank</th></tr>
           </thead>
           <tbody>
             <tr><td>MrsxClutch</td><td>Silver 1 20 LP</td></tr>
